@@ -110,3 +110,53 @@ SELECT * FROM MEMBER WHERE NAME NOT LIKE '박%';
 -- 회원 중에서 이름에 '도'자가 들어간 회원을 조회하시오.
 SELECT * FROM MEMBER WHERE NAME LIKE '%도%';
 
+
+
+-- RegExLib.com
+-- 정규식을 이용한 패턴 비교
+-- 제목에 전화번호가 포함된 게시글을 조회하시오.
+SELECT * FROM NOTICE WHERE REGEXP_LIKE(TITLE, '01[016-9]-\d{3,4}-\d{4}');
+/*
+010-2222-3333
+011-333-4444
+016-234-4363
+017-444-5555
+018-123-2345
+019-214-2345
+[016-9] : 0이나 1이나 6에서9까지 
+\d : [0-9]랑 같다  d는 소문자로 써줘야됨.
+\d{3,4} : \d가 3번이나 4번 반복됨.
+^01[016-9]-\d{3,4}-\d{4}$
+^ : 시작 $ : 끝 이므로
+010-2222-3333 앞에나 뒤에 다른 문자들이 들어가있으면 시작과 끝이 다르므로 검색이 안된다.
+검색 되게 하려면 시작과 끝을 정하지 않고 01[016-9]-\d{3,4}-\D{4} 작성하여 
+이 패턴이 포함되어 있는 문자를 검색해 달라해줌.
+*/
+
+-- 문자열 비교를 위한 정규식
+/*
+ 	ks12b0000@gmail.com
+ 	
+ 	이메일에 꼭 들어가는 것들 : @ . (org com net 3중 1개) 
+ 	이메일 찾기 위한 식 : \D\w*@\D\w* . (org | com | net)
+ 	[0-9a-zA-z]과 일치하는 것 : \w
+ 	? : 0 or 1
+ 	* : 0개 이상
+ 	+ : 1개 이상
+ 	| : org 또는 com 또는 net
+ 	\D : [^0-9] 0부터 9까지가 아닌걸로만 올수 있도록하는 부정연산자
+ */
+
+-- ROWNUM 그리고 행 제한하기
+
+--회원 목록에서 상위 5명만 조회하시오.
+SELECT * FROM MEMBER WHERE ROWNUM BETWEEN 1 AND 5;
+SELECT * FROM MEMBER WHERE ROWNUM BETWEEN 2 AND 10; -- 오류
+
+-- 앞에 별도로 ROWNUM을 만들어주고 별칭을 NUM 으로해서 검색해주면 NUM의 숫자에 맞는 값들을 출력해준다.
+SELECT * FROM (SELECT ROWNUM NUM, MEMBER.* FROM MEMBER)
+WHERE NUM BETWEEN 6 AND 10;
+
+
+-- 중복 값 제거 DISTINCT
+SELECT DISTINCT AGE FROM MEMBER;

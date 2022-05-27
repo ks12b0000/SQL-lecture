@@ -1,54 +1,4 @@
--- RegExLib.com
--- 정규식을 이용한 패턴 비교
--- 제목에 전화번호가 포함된 게시글을 조회하시오.
-SELECT * FROM NOTICE WHERE REGEXP_LIKE(TITLE, '01[016-9]-\d{3,4}-\d{4}');
-/*
-010-2222-3333
-011-333-4444
-016-234-4363
-017-444-5555
-018-123-2345
-019-214-2345
-[016-9] : 0이나 1이나 6에서9까지 
-\d : [0-9]랑 같다  d는 소문자로 써줘야됨.
-\d{3,4} : \d가 3번이나 4번 반복됨.
-^01[016-9]-\d{3,4}-\d{4}$
-^ : 시작 $ : 끝 이므로
-010-2222-3333 앞에나 뒤에 다른 문자들이 들어가있으면 시작과 끝이 다르므로 검색이 안된다.
-검색 되게 하려면 시작과 끝을 정하지 않고 01[016-9]-\d{3,4}-\D{4} 작성하여 
-이 패턴이 포함되어 있는 문자를 검색해 달라해줌.
-*/
-
--- 문자열 비교를 위한 정규식
-/*
- 	ks12b0000@gmail.com
- 	
- 	이메일에 꼭 들어가는 것들 : @ . (org com net 3중 1개) 
- 	이메일 찾기 위한 식 : \D\w*@\D\w* . (org | com | net)
- 	[0-9a-zA-z]과 일치하는 것 : \w
- 	? : 0 or 1
- 	* : 0개 이상
- 	+ : 1개 이상
- 	| : org 또는 com 또는 net
- 	\D : [^0-9] 0부터 9까지가 아닌걸로만 올수 있도록하는 부정연산자
- */
-
--- ROWNUM 그리고 행 제한하기
-
---회원 목록에서 상위 5명만 조회하시오.
-SELECT * FROM MEMBER WHERE ROWNUM BETWEEN 1 AND 5;
-SELECT * FROM MEMBER WHERE ROWNUM BETWEEN 2 AND 10; -- 오류
-
--- 앞에 별도로 ROWNUM을 만들어주고 별칭을 NUM 으로해서 검색해주면 NUM의 숫자에 맞는 값들을 출력해준다.
-SELECT * FROM (SELECT ROWNUM NUM, MEMBER.* FROM MEMBER)
-WHERE NUM BETWEEN 6 AND 10;
-
-
--- 중복 값 제거 DISTINCT
-SELECT DISTINCT AGE FROM MEMBER;
-
-
-/*
+/*	
  	함수의 구분 :
  	문자열함수, 숫자함수, 날짜함수, 변환함수, NULL관련함수, 집계함수 	
  */
@@ -139,6 +89,104 @@ SELECT ASCII('A') FROM DUAL;
 
 -- 코드 값을 문자로 반환하는 함수
 SELECT CHR(65) FROM DUAL;
+
+
+
+-- 숫자 함수
+
+-- 절대값을 구하는 함수 ABS(n)
+SELECT ABS(35), ABS(-35) FROM DUAL; 
+
+-- 음수/양수를 알려주는 함수 SIGN(n)
+SELECT SIGN(35), SIGN(-35), SIGN(0) FROM DUAL;  
+
+-- 숫자의 반올림 값을 알려주는 함수 ROUND(n,i)
+SELECT ROUND(34.456789), ROUND(34.56789) FROM DUAL;  
+SELECT ROUND(34.456789,2), ROUND(34.56789,3) FROM DUAL; -- 반올림 할 소수점의 위치를 정할 수 있음
+
+-- 숫자의 나머지 값을 반환하는 함수 MOD(n1, n2)
+SELECT TRUNC(17/5) 몫, MOD(17, 5) 나머지 FROM DUAL; 
+
+-- 숫자의 제곱을 구하는 함수와 제곱근을 구하는 함수 POWER(n1, n2)/ SQRT(n)
+SELECT POWER(5, 2), SQRT(25) FROM DUAL;  
+
+
+
+-- 날짜 함수
+
+-- 현재 시간을 얻는 함수
+SELECT SYSDATE FROM DUAL;
+
+-- 세션 시간과 포맷 변경
+ALTER SESSION SET TIME_ZONE = '09:00';
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD';
+
+-- 날짜 추출 함수 EXTRACT(YEAR/MONTH/DAY/HOUR/MINUTE/SECOND FROM ...)
+SELECT EXTRACT(YEAR FROM SYSDATE) FROM DUAL;
+SELECT EXTRACT(MONTH FROM SYSDATE) FROM DUAL;
+SELECT EXTRACT(DAY FROM SYSDATE) FROM DUAL;
+SELECT EXTRACT(MINUTE FROM SYSTIMESTAMP) FROM DUAL;
+SELECT EXTRACT(SECOND FROM SYSTIMESTAMP) FROM DUAL;
+
+-- 가입 회원 중에 비수기(2, 3, 5, 11, 12)월 달에 가입한 회원을 조회하시오.
+SELECT EXTRACT(MONTH FROM SYSDATE) || '월' FROM DUAL;
+SELECT * FROM MEMBER WHERE EXTRACT(MONTH FROM REGDATE) IN (2, 3, 5, 11, 12);
+
+-- 날짜를 누적하는 함수 ADD_MONTH(날짜, 정수)
+SELECT ADD_MONTHS(SYSDATE, 1) FROM DUAL;  -- 현재 달에서 1을 더해줌
+SELECT ADD_MONTHS(SYSDATE, -1) FROM DUAL; 	-- 현재 달에서 1을 빼줌
+
+-- 가입 회원 중에 가입한지 6개월이 안 되는 회원을 조회하시오.
+SELECT * FROM MEMBER WHERE ADD_MONTHS(SYSDATE, -6) < REGDATE; 
+
+-- 날짜의 차이를 알아내는 함수 MONTHS_BETWEEN(날짜,날짜)
+SELECT MONTHS_BETWEEN(SYSDATE, TO_DATE('2013-12-24')) FROM DUAL; 
+
+-- 가입 회원 중에 가입한지 6개월이 넘는 회원을 조회하시오.
+SELECT * FROM MEMBER WHERE ADD_MONTHS(SYSDATE, -6) > REGDATE; 
+
+-- 가입 회원 중에 가입한지 현재 날짜와 6개월 넘게 차이나는 회원을 조회하시오
+SELECT * FROM MEMBER WHERE MONTHS_BETWEEN(SYSDATE, REGDATE) > 6; 
+SELECT MONTHS_BETWEEN(SYSDATE, REGDATE) FROM MEMBER; 
+
+-- 다음 요일을 알려주는 함수 NEXT_DAY(현재날짜, 다음요일)
+SELECT NEXT_DAY(SYSDATE, '일요일') FROM DUAL; 
+SELECT NEXT_DAY(SYSDATE, 7) FROM DUAL;  -- 숫자로도 표현 할수 있음 1 부터 일요일 7은 토요일
+
+-- 월의 마지막 일자를 알려주는 함수 LAST_DAY(날짜)
+SELECT LAST_DAY(SYSDATE) FROM DUAL; 
+-- ADD_MONTHS를 이용하여 현재 달에 +n, -n 을해주어서 다른 달의 마지막 일자를 알수있음.
+SELECT LAST_DAY(ADD_MONTHS(SYSDATE, -5)) FROM DUAL;
+
+-- 지정된 범위에서 날짜를 반올림하는/자르는 함수 ROUND/TRUNC(날짜, 포맷)
+SELECT ROUND(TO_DATE('2022-10-30'), 'YEAR'), TRUNC(TO_DATE('2022-10-30'), 'YEAR') FROM DUAL;  
+SELECT SYSDATE, ROUND(SYSDATE, 'MONTH'), TRUNC(SYSDATE, 'MONTH') FROM DUAL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

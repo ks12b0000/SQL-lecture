@@ -52,7 +52,7 @@ SELECT TRANSLATE ('WHERE WE ARE', 'WE', 'YOU') FROM DUAL;
 
 
 /*
--- 문자열 패딩 함수
+-- 1. 문자열 함수
 LPAD : 지정한 길이 만큼 왼쪽부터 특정문자로 채워줌.
 SELECT LPAD(값, 총문자길이, 채울문자) FROM DUAL;
 RPAD : 지정한 길이 만큼 오른쪽부터 특정문자로 채워줌.
@@ -92,7 +92,7 @@ SELECT CHR(65) FROM DUAL;
 
 
 
--- 숫자 함수
+-- 2. 숫자 함수
 
 -- 절대값을 구하는 함수 ABS(n)
 SELECT ABS(35), ABS(-35) FROM DUAL; 
@@ -112,7 +112,7 @@ SELECT POWER(5, 2), SQRT(25) FROM DUAL;
 
 
 
--- 날짜 함수
+-- 3. 날짜 함수
 
 -- 현재 시간을 얻는 함수
 SELECT SYSDATE FROM DUAL;
@@ -164,28 +164,152 @@ SELECT SYSDATE, ROUND(SYSDATE, 'MONTH'), TRUNC(SYSDATE, 'MONTH') FROM DUAL;
 
 
 
+-- 4. 변환 함수
+-- NUMBER 형식을 문자열로 변환 TO_CHAR(NUMBER)
+/*
+ 	  TO_CHAR()     TO_DATE()
+ 	    --->		  --->
+    숫자 <-->   문자열   <-->   날짜
+        <---		  <---		
+     TO_NUMBER()    TO_CHAR()
+     
+     SELECT TO_CHAR(12345678,'$99,999,999,999.99) FROM DUAL;
+     							----------------
+     							앞에 숫자 길이보다 길어야 함
+     	포맷문자    |    설명
+     	  9			  숫자
+     	  0	      빈자리를 채우는 문자
+     	  $		    앞에 $ 표시
+     	  , 	  천 단위 구분자 표시
+     	  . 	     소수점 표시
+ */	 
+SELECT TO_CHAR(12345678,'99999999') || 'HELLO' FROM DUAL;
+SELECT TO_CHAR(1234567890,'99,999,999') || 'HELLO' FROM DUAL; -- 앞에 숫자 길이가 더 길면 올바르지 않은 결과가 나옴. 포맷의 길이를 맞춰줘야함
+SELECT TO_CHAR(1234567,'09,999,999,999') || 'HELLO' FROM DUAL; -- 뒤에 숫자 길이가 더 길면 앞에 자리는 공백으로 채워짐 앞에 0을 쓰면 공백을 0으로 채워줌
+SELECT TO_CHAR(1234567,'$09,999,999,999') || 'HELLO' FROM DUAL; -- 표현해 내야하는게 만약 미국 달러면 앞에 달러를 붙여줌
+SELECT TRIM(TO_CHAR(1234567,'9,999,999,999.99')) || '원' FROM DUAL; -- TRIM을 사용하여 빈 공백을 없애줄 수 있음
+SELECT TRIM(TO_CHAR(1234567.345,'9,999,999,999.99')) || '원' FROM DUAL;
+-- .을이용하여 소수점을 나타내줄 수 있음 뒤에 소수점 길이보다 앞에 소수점 길이가 더 길면 뒤에 길이만큼 반올림되어서 나타냄
 
 
 
+/*
+ 	포맷문자			|    설명
+YYYY/RRRR/YY/YEAR	 년도표시 : 4자리/Y2K/2자리/영문
+   MM/MON/MONTH		 월표시 : 2자리/영문3자리/영문전체
+   DD/DAY/DDTH		 일표시 : 2자리/영문/2자리ST
+   	 AM/PM			 	오전/오후표시
+   	HH/HH24		     시간표시 : 12시간/24시간
+   	  MI			 분표시 : 0~59분
+   	  SS			 초표시 : 0~59초
+ */
+-- DATE 형식을 문자열로 변환 TO_CHAR(DATETIME)
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD PM HH12:MI:SS') FROM DUAL;
+
+-- 문자열을 날짜 형식으로 변환하는 함수 TO_DATE(문자열, 날짜포맷)
+SELECT TO_DATE('2022-05-28', 'YYYY-MM-DD') FROM DUAL; 
+
+-- 문자열을 숫자형식으로 변환하는 함수 TO_TIMESTAMP(문자열)
+SELECT TO_TIMESTAMP('2022-05-28', 'YYYY-MM-DD') FROM DUAL; 
+
+-- 문자열을 숫자형식으로 변환하는 함수 TO_NUMBER(문자열)
+SELECT TO_NUMBER('2022') FROM DUAL; 
+SELECT TO_NUMBER('2') + 3 FROM DUAL;
 
 
 
+-- 5. NULL 관련 함수
+-- 반환 값이 NULL일 경우에 대체 값을 제공하는 NVL(NULL, 대체값)함수 
+SELECT AGE + 3 FROM MEMBER;  -- NULL 값에 값을 더해줘도 NULL이 됨
+SELECT NVL(AGE, 0) FROM MEMBER; -- NULL 값을 0으로 대체함
+SELECT TRUNC(NVL(AGE, 0)/10)*10 FROM MEMBER; 
+-- NVL에서 조건을 하나 더 확장한 NVL2(입력값, NOTLULL대체값, NULL대체값) 함수
+SELECT NVL2(AGE, TRUNC(AGE/10)*10, 0) FROM MEMBER; -- NULL이 아닌경우만 연산을 할 수 있도록함 NULL일 경우는 0이 나옴
+-- 위에 SELECT TRUNC(NVL(AGE, 0)/10)*10 FROM MEMBER; 
+-- 조건은 NULL값 까지 연산을 수행함 두 결과 값은 동일하지만 수행하는 횟수가 달라짐.
+
+-- 두 값이 같은 경우 NULL 그렇지 않은 경우 첫 번째 값 반환 NULLIF(값1, 값2) 함수
+SELECT NULLIF(AGE, 29) FROM MEMBER; -- AGE가 29인 값을 NULL로 바꿔줌
+
+-- 조건에 따른 값 선택하기 DECODE(기준값, 비교값, 출력값, 비교값, 출력값)
+SELECT DECODE(GENDER, '남성', 1, 2) FROM MEMBER; -- 성별이 남성일 경우 1로표시 아닐경우 2로표시
+SELECT DECODE(SUBSTR(PHONE, 1, 3), '011','SK','016','KT', '기타')
+FROM MEMBER;   -- 폰번호 앞 3자리가 011일 경우 SK, 016일경우 KT 나머지는 기타로 표시
+
+SELECT DECODE(SUBSTR(PHONE, 1, 3),
+					'011', 'SK',
+					'016', 'KT',
+					'기타') || ', ' || PHONE 
+					FROM MEMBER;
+-- 가독성이 좋게 위에 처럼 작성할 수 있음						
+
+
+-- 6. 연산 절
+/*	
+  	SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY	-- 순서가 바뀌어서는 안됨.			
+	FROM절은 기본적인 데이터 구조를 연산하는 공간, 테이블, 여러 개의 테이블이 갖고 있는 레코드를 합친 연산이 올수 있음 격자형 데이터를 마련하는 것
+	-> WHERE절을 사용하여 조건에 맞는 것만 필터링 할수 있음 
+	-> GROUP BY절은 집계 함수
+	-> HAVING 집계된 결과를 필터링할 때 사용
+	-> ORDER BY절은 집계된 이후에 정렬하는 것
+*/
+
+-- 정렬하기 ORDER BY절
+-- ASC(오름차순), DESC(내림차순) 작성하지 않으면 기본으로 ASC차순으로 정렬됨
+				
+-- 이름을 기준으로 역순으로 정렬해서 조회하시오.
+SELECT * FROM MEMBER ORDER BY NAME DESC ;
+
+-- 회원 중에서 '박'씨 성을 가진 회원을 조회하시오. 단 나이를 오름차순으로 정렬
+SELECT * FROM MEMBER WHERE NAME LIKE '박%' ORDER BY AGE ASC;
+
+-- 회원 중에서 '박'씨 성을 가진 회원을 조회하시오. 단 나이를 오름차순으로 정렬하고 나이가 같으면 REGDATE를 내림차순으로 정렬하시오
+SELECT * FROM MEMBER WHERE NAME LIKE '박%' ORDER BY AGE ASC, REGDATE DESC; -- 추가 2차정렬
 
 
 
+-- 7. 집계 함수
+-- SUM(합계), MIN(최소값), MAX(최대값), COUNT(수), AVG(평균값)
+SELECT COUNT(ID) FROM NOTICE;	-- 전체 레코드 수 NULL은 빼서구하므로 절대 NULL이 들어가지 않는 컬럼으로 구한다
+SELECT SUM(HIT) FROM NOTICE;	-- 공지사항 전체 조회수
+SELECT AVG(HIT) FROM NOTICE;	-- 공지사항 평균 조회수
+-- 아이디별 공지사항 작성 횟수 구하기
+SELECT WRITER_ID, COUNT(ID) COUNT 
+FROM NOTICE 
+GROUP BY WRITER_ID 
+ORDER BY COUNT DESC ;
 
+-- 실행 순서 
+-- FROM -> CONNECT BY -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY 
 
+-- HAVING절
+-- 회원별 게시글 수 조회하시오 단 게시글 수가 2미만인 레코드만 출력하시오.
+SELECT WRITER_ID, COUNT(ID) COUNT 
+FROM NOTICE 
+GROUP BY WRITER_ID 
+HAVING COUNT(ID) < 2; 
+-- 집계함수는 GROUP BY절 이후부터 사용 할수 있음
+-- ROWNUM은 WHERE절쯤에서 만들어지므로
+-- ORDER BY HIT 순으로 섞여버려서 ROWNUM을 엉켜버림
+-- 정렬할 이후 ROWNUM을 붙이고 싶을때 방법있음
+-- HIT기준으로 정렬 후 일련번호를 붙이게 만들어 줌
+SELECT ROW_NUMBER() OVER (ORDER BY HIT), ID, TITLE ,WRITER_ID , REGDATE , HIT 
+FROM NOTICE;
+--ORDER BY HIT;
 
+-- RANK를 사용하면 등수로 바뀜
+SELECT RANK() OVER (ORDER BY HIT), ID, TITLE ,WRITER_ID , REGDATE , HIT 
+FROM NOTICE;
 
-
-
-
-
-
-
-
-
-
+-- RANK를 사용했을때는 공동 1등다음 3으로 넘어갔는데
+-- DENSE_RANK 를 사용하면 공동 1등다음 수를 2로 이어지게 만들어줌
+SELECT DENSE_RANK() OVER (ORDER BY HIT), ID, TITLE ,WRITER_ID , REGDATE , HIT 
+FROM NOTICE;
+--  PARTITION BY를 사용하여 그룹별로 정렬하여 그룹별 등수도 정할 수 있다
+-- 기준 정렬은 오름차순으로 정렬됨
+SELECT DENSE_RANK() OVER (PARTITION BY WRITER_ID ORDER BY HIT), ID, TITLE ,WRITER_ID , REGDATE , HIT 
+FROM NOTICE;
 
 
 

@@ -1,37 +1,37 @@
--- ë¶€ì¡°íšŒ(ì„œë¸Œì¿¼ë¦¬) ë¨¼ì € ì‹¤í–‰ì´ ë˜ì•¼í•˜ëŠ” ê²½ìš° ì‚¬ìš©
--- êµ¬ì ˆì˜ ìˆœì„œë¥¼ ë°”ê¿”ì•¼ í•˜ëŠ” ê²½ìš°
+-- ºÎÁ¶È¸(¼­ºêÄõ¸®) ¸ÕÀú ½ÇÇàÀÌ µÇ¾ßÇÏ´Â °æ¿ì »ç¿ë
+-- ±¸ÀýÀÇ ¼ø¼­¸¦ ¹Ù²ã¾ß ÇÏ´Â °æ¿ì
 SELECT * 
 FROM NOTICE
 WHERE ROWNUM BETWEEN 1 AND 5;
--- ìµœì‹  ë“±ë¡ìˆœìœ¼ë¡œ ì •ë ¬í•œ ê²°ê³¼ì—ì„œ ê°€ìž¥ ìµœì‹ ê¸€ 5ê°œë¥¼ ì›í•˜ëŠ” ê²½ìš°ë¼ë©´?
+-- ÃÖ½Å µî·Ï¼øÀ¸·Î Á¤·ÄÇÑ °á°ú¿¡¼­ °¡Àå ÃÖ½Å±Û 5°³¸¦ ¿øÇÏ´Â °æ¿ì¶ó¸é?
 SELECT *
 FROM ( SELECT * FROM NOTICE ORDER BY REGDATE DESC )
 WHERE ROWNUM BETWEEN 1 AND 5;
 
--- ë‚˜ì´ê°€ 30 ì´ìƒì¸ íšŒì› ëª©ë¡ì„ ì¡°íšŒí•˜ì‹œì˜¤.
+-- ³ªÀÌ°¡ 30 ÀÌ»óÀÎ È¸¿ø ¸ñ·ÏÀ» Á¶È¸ÇÏ½Ã¿À.
 SELECT *
 FROM MEMBER
 WHERE AGE >= 30; 
 
--- í‰ê· ë‚˜ì´ ì´ìƒì¸ íšŒì› êµ¬í•˜ê¸°
+-- Æò±Õ³ªÀÌ ÀÌ»óÀÎ È¸¿ø ±¸ÇÏ±â
 SELECT *
 FROM MEMBER
 WHERE AGE >= (SELECT AVG(AGE) FROM MEMBER);
 
 /*
- 	ì¡°ì¸(JOIN) : 'ë‘ ê°œ ì´ìƒì˜ í…Œì´ë¸”ì„ ì„œë¡œ ì—°ê²°í•˜ì—¬ ë°ì´í„°ë¥¼ ê²€ìƒ‰í•  ë•Œ 
-				ì‚¬ìš©í•˜ëŠ” ë°©ë²•ìœ¼ë¡œÂ ë‘ ê°œì˜ í…Œì´ë¸”ì„ ë§ˆì¹˜ í•˜ë‚˜ì˜ í…Œì´ë¸”ì¸ ê²ƒì²˜ëŸ¼ ë³´ì—¬ì£¼ëŠ” ê²ƒì´ë‹¤.Â 'Â 
- 	ì¡°ì¸ì˜ ì¢…ë¥˜ :
+ 	Á¶ÀÎ(JOIN) : 'µÎ °³ ÀÌ»óÀÇ Å×ÀÌºíÀ» ¼­·Î ¿¬°áÇÏ¿© µ¥ÀÌÅÍ¸¦ °Ë»öÇÒ ¶§ 
+				»ç¿ëÇÏ´Â ¹æ¹ýÀ¸·Î?µÎ °³ÀÇ Å×ÀÌºíÀ» ¸¶Ä¡ ÇÏ³ªÀÇ Å×ÀÌºíÀÎ °ÍÃ³·³ º¸¿©ÁÖ´Â °ÍÀÌ´Ù.?'?
+ 	Á¶ÀÎÀÇ Á¾·ù :
  	INNER JOIN, OUTER JOIN, SELF JOIN, CROSS JOIN(Cartesian Product)
  	
- 	ì„œë¡œ ê´€ê³„ê°€ ìžˆëŠ” ë ˆì½”ë“œë“¤ì€ INNER
- 	ê´€ê³„ê°€ ì—†ëŠ” ë ˆì½”ë“œë“¤ì€ OUTER
+ 	¼­·Î °ü°è°¡ ÀÖ´Â ·¹ÄÚµåµéÀº INNER
+ 	°ü°è°¡ ¾ø´Â ·¹ÄÚµåµéÀº OUTER
  **/
 
--- INNER JOIN : ê´€ê³„ê°€ ìžˆëŠ” ë ˆì½”ë“œë“¤ë§Œ í•©ì¹˜ëŠ” ì¡°ì¸
--- ì°¸ì¡°í‚¤ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì¼ì¹˜í•˜ëŠ” í–‰ë§Œ ì¡°ì¸
+-- INNER JOIN : °ü°è°¡ ÀÖ´Â ·¹ÄÚµåµé¸¸ ÇÕÄ¡´Â Á¶ÀÎ
+-- ÂüÁ¶Å°¸¦ ±âÁØÀ¸·Î ÀÏÄ¡ÇÏ´Â Çà¸¸ Á¶ÀÎ
 -- MEMBER INNER JOIN NOTICE ON MEMBER.ID = NOTICE.WRITER_ID 
--- í‘œì¤€ë°©ì‹
+-- Ç¥ÁØ¹æ½Ä
 SELECT * 
 FROM MEMBER INNER JOIN NOTICE 
 	ON MEMBER.ID = NOTICE.WRITER_ID; 
@@ -42,7 +42,7 @@ WHERE A.ID = B.WRITER_ID ;
 
 
 -- OUTER JOIN
--- ì°¸ì¡°í‚¤ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì¼ì¹˜í•˜ì§€ ì•ŠëŠ” í–‰ë„ í¬í•¨ì‹œí‚¤ëŠ” ì¡°ì¸
+-- ÂüÁ¶Å°¸¦ ±âÁØÀ¸·Î ÀÏÄ¡ÇÏÁö ¾Ê´Â Çàµµ Æ÷ÇÔ½ÃÅ°´Â Á¶ÀÎ
 -- MEMBER LEFT/RIGHT/FULL OUTER JOIN NOTICE ON MEMBER.ID = NOTICE.WRITER_ID 
 SELECT *
 FROM MEMBER A LEFT OUTER JOIN NOTICE B 
@@ -57,21 +57,21 @@ FROM MEMBER A FULL OUTER JOIN NOTICE B
 	ON A.ID = B.WRITER_ID ;
 
 
--- ë‚´ë¶€ ì¡°ì¸ ì—°ìŠµ
--- ì»¬ëŸ¼ì„ ì§€ì •í•˜ëŠ” ì‹ë³„ìžë¥¼ ì¤„ì´ê¸° ìœ„í•´ì„œ í…Œì´ë¸”ì˜ ë³„ì¹­ì„ ì‚¬ìš©
+-- ³»ºÎ Á¶ÀÎ ¿¬½À
+-- ÄÃ·³À» ÁöÁ¤ÇÏ´Â ½Äº°ÀÚ¸¦ ÁÙÀÌ±â À§ÇØ¼­ Å×ÀÌºíÀÇ º°ÄªÀ» »ç¿ë
 SELECT B.ID , B.WRITER_ID , A.NAME 
 FROM MEMBER A INNER JOIN NOTICE B 
 	ON A.ID = B.WRITER_ID ;
 
--- ID, NAME ê·¸ë¦¬ê³  íšŒì›ë³„ ìž‘ì„±í•œ ê²Œì‹œê¸€ ìˆ˜ë¥¼ ì¡°íšŒí•˜ì‹œì˜¤.
+-- ID, NAME ±×¸®°í È¸¿øº° ÀÛ¼ºÇÑ °Ô½Ã±Û ¼ö¸¦ Á¶È¸ÇÏ½Ã¿À.
 SELECT A.ID , A.NAME , COUNT(B.ID) COUNT 
 FROM MEMBER A LEFT OUTER JOIN NOTICE B
 	ON A.ID = B.WRITER_ID
 GROUP BY A.ID , A.NAME ;
 
 
--- ìžê¸° ì¡°ì¸(SELF JOIN)
--- ë°ì´í„°ê°€ ì„œë¡œ í¬í•¨ ê´€ê³„ë¥¼ ê°€ì§€ëŠ” ê²½ìš° : ë‹´ë‹¹, êµ¬ì„±, ì—°ë½
+-- ÀÚ±â Á¶ÀÎ(SELF JOIN)
+-- µ¥ÀÌÅÍ°¡ ¼­·Î Æ÷ÇÔ °ü°è¸¦ °¡Áö´Â °æ¿ì : ´ã´ç, ±¸¼º, ¿¬¶ô
 SELECT M.*, B.NAME BOSS_NAME
 FROM MEMBER M LEFT OUTER JOIN MEMBER B
 	ON B.ID = M.BOSS_ID;
@@ -79,7 +79,7 @@ FROM MEMBER M LEFT OUTER JOIN MEMBER B
 
 
 /*
- 	ì˜¤ë¼í´ INNER JOIN  
+ 	¿À¶óÅ¬ INNER JOIN  
  	
  	- ANSI INNER JOIN
  	SELECT B.ID, B.TLTLE, A.NAME
@@ -101,7 +101,7 @@ FROM MEMBER M LEFT OUTER JOIN MEMBER B
 	FROM MEMBER A, NOTICE B
 	WHERE A.ID = B.WRITER_ID(+) ;
 	
-	- ORACLE FULL OUTER JOINì€ ì§€ì›í•˜ì§€ ì•ŠëŠ”ë‹¤.
+	- ORACLE FULL OUTER JOINÀº Áö¿øÇÏÁö ¾Ê´Â´Ù.
  */
 SELECT N.*, M.NAME WRITER_NAME
 FROM NOTICE N JOIN MEMBER M 
@@ -119,22 +119,22 @@ WHERE M.ID(+) = N.WRITER_ID ;
 
 
 
--- ìœ ë‹ˆì˜¨(UNION) : ë‘ ê°œì˜ SELECT ê²°ê³¼ë¥¼ í•©ì¹¨
+-- À¯´Ï¿Â(UNION) : µÎ °³ÀÇ SELECT °á°ú¸¦ ÇÕÄ§
 -- UNION, MINUS, INTERSECT, UNION ALL
 SELECT ID, NAME FROM MEMBER
-	UNION -- ê³µí†µëœ ê²ƒì€ ì œì™¸í•¨
+	UNION -- °øÅëµÈ °ÍÀº Á¦¿ÜÇÔ
 SELECT WRITER_ID, TITLE FROM NOTICE;
 
 SELECT ID, NAME FROM MEMBER
-	UNION ALL -- ì „ì²´ê°€ ë‹¤ ë‚˜ì˜´
+	UNION ALL -- ÀüÃ¼°¡ ´Ù ³ª¿È
 SELECT WRITER_ID, TITLE FROM NOTICE;
 
 SELECT ID, NAME FROM MEMBER
-	MINUS -- ìœ„ì— ê°€ì§€ê³  ìžˆëŠ” ê²ƒì¤‘ ë°‘ì—ëž‘ ê³µí†µëœ ê²ƒì„ ë¹¼ì¤Œ
+	MINUS -- À§¿¡ °¡Áö°í ÀÖ´Â °ÍÁß ¹Ø¿¡¶û °øÅëµÈ °ÍÀ» »©ÁÜ
 SELECT WRITER_ID, TITLE FROM NOTICE;
 
 SELECT ID, NAME FROM MEMBER
-	INTERSECT -- ê³µí†µëœ ê²ƒë§Œ ë‚¨ê²¨ë‘ 
+	INTERSECT -- °øÅëµÈ °Í¸¸ ³²°ÜµÒ
 SELECT WRITER_ID, TITLE FROM NOTICE;
 
 
@@ -156,8 +156,8 @@ FROM MEMBER
 WHERE ID LIKE '%n%';
 
 
--- VIEW(ë·°) ë§Œë“¤ê¸°
--- ê²Œì‹œê¸€ ì¡°ì¸í•˜ê¸°
+-- VIEW(ºä) ¸¸µé±â
+-- °Ô½Ã±Û Á¶ÀÎÇÏ±â
 CREATE VIEW NOTICE_VIEW
 AS
 	SELECT N.ID , N.TITLE , N.WRITER_ID , M.NAME , COUNT(C.ID) CNT 
@@ -168,10 +168,8 @@ AS
 
 SELECT * FROM NOTICE_VIEW;
 
-
-
-
-
+SELECT * FROM USER_TABLES;
+SELECT * FROM USER_TAB_COLUMNS WHERE TABLE_NAME='NOTICE';
 
 
 
